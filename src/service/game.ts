@@ -4,12 +4,7 @@ export type Game = {
   leftHints: number[][];
 };
 
-function mixSeedTo32(
-  seed: string,
-  height: number,
-  width: number,
-  threshold: number
-): number {
+function mixSeedTo32(seed: string, height: number, width: number, threshold: number): number {
   // Convert seed string to numeric hash (simple fn)
   let s = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -25,8 +20,9 @@ function mixSeedTo32(
 }
 
 function mulberry32(seed: number) {
-  return function () {
-    let t = (seed += 0x6d2b79f5);
+  return () => {
+    seed += 0x6d2b79f5;
+    let t = seed;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -70,27 +66,15 @@ function buildHints(board: boolean[][], height: number, width: number) {
   return { topHints, leftHints };
 }
 
-export function buildGame(
-  seed: string,
-  height: number,
-  width: number,
-  threshold = 0.5,
-  step = 0.05
-): Game {
+export function buildGame(seed: string, height: number, width: number, threshold = 0.5, step = 0.05): Game {
   const rand = mulberry32(mixSeedTo32(seed, height, width, threshold));
 
   // Store random values once
-  const randomValues: number[][] = Array.from({ length: height }, () =>
-    Array.from({ length: width }, () => rand())
-  );
+  const randomValues: number[][] = Array.from({ length: height }, () => Array.from({ length: width }, () => rand()));
 
-  const thresholds: number[][] = Array.from({ length: height }, () =>
-    Array.from({ length: width }, () => threshold)
-  );
+  const thresholds: number[][] = Array.from({ length: height }, () => Array.from({ length: width }, () => threshold));
 
-  const board: boolean[][] = Array.from({ length: height }, () =>
-    Array(width).fill(false)
-  );
+  const board: boolean[][] = Array.from({ length: height }, () => Array(width).fill(false));
 
   const fillBoard = () => {
     for (let r = 0; r < height; r++) {
