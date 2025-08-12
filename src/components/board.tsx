@@ -1,34 +1,56 @@
-import React, { useState } from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import type { Game } from "@/service/game";
 
-type CellType = "empty" | "filled" | "marked";
+type CellType = "empty" | "filled" | "crossed";
 
 type CellProps = {
   type: CellType;
+  result: boolean;
   onClick: () => void;
+  onRightClick: () => void;
   style?: React.CSSProperties;
   className?: string;
 };
-const Cell: React.FC<CellProps> = ({ type, onClick, style, className }) => {
+const Cell: React.FC<CellProps> = ({ type, onClick, onRightClick, style, className, result }) => {
   const base =
     "w-6 h-6 border border-gray-300 flex items-center justify-center cursor-pointer select-none";
+
+  // Determine if the current cell state is correct
+  const isCorrect = type === "empty" || (type === "filled" && result) || (type === "crossed" && !result);
+
+  const handleRightClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent context menu
+    onRightClick();
+  };
+
   switch (type) {
     case "filled":
       return (
         <div
           onClick={onClick}
+          onContextMenu={handleRightClick}
           style={style}
-          className={cn(base, "bg-gray-800", className)}
+          className={cn(
+            base,
+            isCorrect ? "bg-gray-500" : "bg-red-400",
+            className
+          )}
         ></div>
       );
-    case "marked":
+    case "crossed":
       return (
         <div
           onClick={onClick}
+          onContextMenu={handleRightClick}
           style={style}
-          className={cn(base, "text-red-500 text-lg font-bold", className)}
+          className={cn(
+            base,
+            isCorrect ? "text-gray-700" : "text-red-400",
+            "text-lg font-bold",
+            className
+          )}
         >
           &times;
         </div>
@@ -37,6 +59,7 @@ const Cell: React.FC<CellProps> = ({ type, onClick, style, className }) => {
       return (
         <div
           onClick={onClick}
+          onContextMenu={handleRightClick}
           style={style}
           className={cn(base, "bg-white", className)}
         ></div>
@@ -44,25 +67,38 @@ const Cell: React.FC<CellProps> = ({ type, onClick, style, className }) => {
   }
 };
 
+type PlayMode = "fill" | "cross";
+
 type BoardProps = {
-  initialGrid: CellType[][];
   game: Game;
+  grid: CellType[][];
+  onGridChange?: (grid: CellType[][]) => void;
+  playMode: PlayMode;
 };
 
-const Board: React.FC<BoardProps> = ({ initialGrid, game }) => {
+const Board: React.FC<BoardProps> = ({ grid, game, onGridChange, playMode }) => {
   const rows = game.leftHints.length;
   const cols = game.topHints.length;
-  const [grid, setGrid] = useState<CellType[][]>(initialGrid);
 
-  const toggleCell = (r: number, c: number) => {
-    setGrid((prev) => {
-      const newGrid = prev.map((row) => [...row]);
-      const current = newGrid[r][c];
+  const toggleCell = (r: number, c: number, reverseMode = false) => {
+    if (!onGridChange) return;
+    const newGrid = grid.map((row) => [...row]);
+    const current = newGrid[r][c];
+    const currentMode: PlayMode = reverseMode ? (playMode === "fill" ? "cross" : "fill") : playMode;
+
+    if (currentMode === "fill") {
+      // Fill mode: empty -> filled -> empty
       if (current === "empty") newGrid[r][c] = "filled";
-      else if (current === "filled") newGrid[r][c] = "marked";
-      else newGrid[r][c] = "empty";
-      return newGrid;
-    });
+      else if (current === "filled") newGrid[r][c] = "empty";
+      else newGrid[r][c] = "filled"; // crossed -> filled
+    } else {
+      // Cross mode: empty -> crossed -> empty
+      if (current === "empty") newGrid[r][c] = "crossed";
+      else if (current === "crossed") newGrid[r][c] = "empty";
+      else newGrid[r][c] = "crossed"; // filled -> crossed
+    }
+
+    onGridChange(newGrid);
   };
 
   const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length));
@@ -76,12 +112,10 @@ const Board: React.FC<BoardProps> = ({ initialGrid, game }) => {
       <div
         className="inline-grid"
         style={{
-          gridTemplateColumns: `${
-            maxLeftHintWidth * 1.5
-          }rem repeat(${cols}, 1.5rem)`,
-          gridTemplateRows: `${
-            maxTopHintHeight * 1.5
-          }rem repeat(${rows}, 1.5rem)`,
+          gridTemplateColumns: `${maxLeftHintWidth * 1.5
+            }rem repeat(${cols}, 1.5rem)`,
+          gridTemplateRows: `${maxTopHintHeight * 1.5
+            }rem repeat(${rows}, 1.5rem)`,
         }}
       >
         {/* Empty top-left corner */}
@@ -142,7 +176,9 @@ const Board: React.FC<BoardProps> = ({ initialGrid, game }) => {
               <Cell
                 key={`${rIdx}-${cIdx}`}
                 type={cell}
+                result={game.board[rIdx][cIdx]}
                 onClick={() => toggleCell(rIdx, cIdx)}
+                onRightClick={() => toggleCell(rIdx, cIdx, true)}
                 style={{
                   gridColumnStart: cIdx + 2,
                   gridRowStart: rIdx + 2,
@@ -158,3 +194,4 @@ const Board: React.FC<BoardProps> = ({ initialGrid, game }) => {
 };
 
 export default Board;
+export type { PlayMode };

@@ -2,7 +2,57 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+export interface InputProps extends Omit<React.ComponentProps<"input">, 'onChange' | 'onBlur'> {
+  // Number validation props
+  numberValidation?: 'int' | 'float';
+
+  // Enhanced handlers
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onValueChange?: (value: number | string) => void;
+}
+
+function Input({
+  className,
+  type,
+  numberValidation,
+  onChange,
+  onBlur,
+  onValueChange,
+  min,
+  max,
+  ...props
+}: InputProps) {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (numberValidation && type === "number") {
+      const value = e.target.value;
+      if (value === '') {
+        onValueChange?.('');
+      } else {
+        const parseValue = numberValidation === 'float' ? parseFloat : parseInt;
+        onValueChange?.(parseValue(value) || '');
+      }
+    }
+    onChange?.(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (numberValidation && type === "number" && min !== undefined && max !== undefined) {
+      const parseValue = numberValidation === 'float' ? parseFloat : parseInt;
+      const value = parseValue(e.target.value);
+      const minNum = typeof min === 'string' ? parseFloat(min) : min;
+      const maxNum = typeof max === 'string' ? parseFloat(max) : max;
+      if (isNaN(value) || value < minNum || value > maxNum) {
+        const correctedValue = Math.max(minNum, Math.min(maxNum, value || minNum));
+        onValueChange?.(correctedValue);
+        // Update the input value directly
+        e.target.value = correctedValue.toString();
+      }
+    }
+    onBlur?.(e);
+  };
+
   return (
     <input
       type={type}
@@ -13,6 +63,10 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      min={min}
+      max={max}
       {...props}
     />
   )
