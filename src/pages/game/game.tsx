@@ -3,7 +3,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import Board, { type PlayMode } from '@/pages/game/board';
+import Board from '@/pages/game/board';
+import type { InputType } from '@/pages/game/cell';
 import { buildGame } from '@/services/game';
 
 // Configuration constants
@@ -18,13 +19,14 @@ function GamePage() {
   const [height, setHeight] = React.useState<number | string>(20);
   const [width, setWidth] = React.useState<number | string>(20);
   const [threshold, setThreshold] = React.useState<number | string>(0.6);
+
   const [game, setGame] = React.useState(() => buildGame(seed, 20, 20, 0.6));
-  const [grid, setGrid] = React.useState<('empty' | 'filled' | 'crossed')[][]>(() => {
+  const [inputMode, setInputMode] = React.useState<InputType>('filled');
+  const [grid, setGrid] = React.useState<InputType[][]>(() => {
     const heightNum = typeof height === 'number' ? height : parseInt(height as string) || DIMENSION_MIN;
     const widthNum = typeof width === 'number' ? width : parseInt(width as string) || DIMENSION_MIN;
     return Array.from({ length: heightNum }, () => Array.from({ length: widthNum }, () => 'empty'));
   });
-  const [playMode, setPlayMode] = React.useState<PlayMode>('fill');
 
   const handleSeedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSeed(e.target.value);
@@ -41,7 +43,7 @@ function GamePage() {
   };
 
   const handleShowSolution = () => {
-    setGrid(game.board.map((row) => row.map((cell) => (cell ? 'filled' : 'empty'))));
+    setGrid(grid.map((row) => row.map((cell) => (cell === 'empty' ? 'solution' : cell))));
   };
 
   return (
@@ -105,7 +107,7 @@ function GamePage() {
         </Button>
       </div>
       <div className="mt-4">
-        <Board grid={grid} game={game} onGridChange={setGrid} playMode={playMode} />
+        <Board grid={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
       </div>
       <div className="mt-4 flex items-center gap-2 flex-wrap">
         <span className="text-sm font-medium">Mode:</span>
@@ -113,11 +115,11 @@ function GamePage() {
           variant="outline"
           size="lg"
           type="single"
-          value={playMode}
-          onValueChange={(value) => value && setPlayMode(value as PlayMode)}
+          value={inputMode}
+          onValueChange={(value) => value && setInputMode(value as InputType)}
         >
-          <ToggleGroupItem value="fill">Fill</ToggleGroupItem>
-          <ToggleGroupItem value="cross">Cross</ToggleGroupItem>
+          <ToggleGroupItem value="filled">Fill</ToggleGroupItem>
+          <ToggleGroupItem value="crossed">Cross</ToggleGroupItem>
         </ToggleGroup>
       </div>
     </>

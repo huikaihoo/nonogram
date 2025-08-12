@@ -1,5 +1,5 @@
 export type Game = {
-  board: boolean[][];
+  result: boolean[][];
   topHints: number[][];
   leftHints: number[][];
 };
@@ -74,24 +74,24 @@ export function buildGame(seed: string, height: number, width: number, threshold
 
   const thresholds: number[][] = Array.from({ length: height }, () => Array.from({ length: width }, () => threshold));
 
-  const board: boolean[][] = Array.from({ length: height }, () => Array(width).fill(false));
+  const result: boolean[][] = Array.from({ length: height }, () => Array(width).fill(false));
 
   const fillBoard = () => {
     for (let r = 0; r < height; r++) {
       for (let c = 0; c < width; c++) {
-        board[r][c] = randomValues[r][c] < thresholds[r][c];
+        result[r][c] = randomValues[r][c] < thresholds[r][c];
       }
     }
   };
 
   const hasEmptyRowOrCol = (): boolean => {
     for (let r = 0; r < height; r++) {
-      if (board[r].every((cell) => !cell)) return true;
+      if (result[r].every((cell) => !cell)) return true;
     }
     for (let c = 0; c < width; c++) {
       let colEmpty = true;
       for (let r = 0; r < height; r++) {
-        if (board[r][c]) {
+        if (result[r][c]) {
           colEmpty = false;
           break;
         }
@@ -103,7 +103,7 @@ export function buildGame(seed: string, height: number, width: number, threshold
 
   const bumpEmptyThresholds = () => {
     for (let r = 0; r < height; r++) {
-      if (board[r].every((cell) => !cell)) {
+      if (result[r].every((cell) => !cell)) {
         for (let c = 0; c < width; c++) {
           thresholds[r][c] = Math.min(1, thresholds[r][c] + step);
         }
@@ -112,7 +112,7 @@ export function buildGame(seed: string, height: number, width: number, threshold
     for (let c = 0; c < width; c++) {
       let colEmpty = true;
       for (let r = 0; r < height; r++) {
-        if (board[r][c]) {
+        if (result[r][c]) {
           colEmpty = false;
           break;
         }
@@ -133,7 +133,7 @@ export function buildGame(seed: string, height: number, width: number, threshold
     bumpEmptyThresholds();
   }
 
-  const { topHints, leftHints } = buildHints(board, height, width);
+  const { topHints, leftHints } = buildHints(result, height, width);
 
-  return { board, topHints, leftHints };
+  return { result, topHints, leftHints };
 }

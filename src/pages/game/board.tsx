@@ -2,38 +2,34 @@ import type React from 'react';
 
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import Cell, { type CellType } from '@/pages/game/cell';
+import Cell, { type InputType } from '@/pages/game/cell';
 import type { Game } from '@/services/game';
-
-type PlayMode = 'fill' | 'cross';
 
 type BoardProps = {
   game: Game;
-  grid: CellType[][];
-  onGridChange?: (grid: CellType[][]) => void;
-  playMode: PlayMode;
+  inputMode: InputType;
+  grid: InputType[][];
+  onGridChange?: (grid: InputType[][]) => void;
 };
 
-const Board: React.FC<BoardProps> = ({ grid, game, onGridChange, playMode }) => {
+const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) => {
   const rows = game.leftHints.length;
   const cols = game.topHints.length;
 
   const toggleCell = (r: number, c: number, reverseMode = false) => {
     if (!onGridChange) return;
-    const newGrid = grid.map((row) => [...row]);
-    const current = newGrid[r][c];
-    const currentMode: PlayMode = reverseMode ? (playMode === 'fill' ? 'cross' : 'fill') : playMode;
+    const current = grid[r][c];
 
-    if (currentMode === 'fill') {
-      // Fill mode: empty -> filled -> empty
-      if (current === 'empty') newGrid[r][c] = 'filled';
-      else if (current === 'filled') newGrid[r][c] = 'empty';
-      else newGrid[r][c] = 'filled'; // crossed -> filled
-    } else {
-      // Cross mode: empty -> crossed -> empty
-      if (current === 'empty') newGrid[r][c] = 'crossed';
-      else if (current === 'crossed') newGrid[r][c] = 'empty';
-      else newGrid[r][c] = 'crossed'; // filled -> crossed
+    // Only allow clicks if the cell is empty
+    if (current !== 'empty') return;
+
+    const newGrid = grid.map((row) => [...row]);
+    const currentMode: InputType = reverseMode ? (inputMode === 'filled' ? 'crossed' : 'filled') : inputMode;
+
+    if (currentMode === 'filled') {
+      newGrid[r][c] = 'filled';
+    } else if (currentMode === 'crossed') {
+      newGrid[r][c] = 'crossed';
     }
 
     onGridChange(newGrid);
@@ -111,8 +107,8 @@ const Board: React.FC<BoardProps> = ({ grid, game, onGridChange, playMode }) => 
             return (
               <Cell
                 key={`${rIdx}-${cIdx}`}
-                type={cell}
-                result={game.board[rIdx][cIdx]}
+                input={cell}
+                result={game.result[rIdx][cIdx]}
                 onClick={() => toggleCell(rIdx, cIdx)}
                 onRightClick={() => toggleCell(rIdx, cIdx, true)}
                 style={{
@@ -130,4 +126,3 @@ const Board: React.FC<BoardProps> = ({ grid, game, onGridChange, playMode }) => 
 };
 
 export default Board;
-export type { PlayMode };
