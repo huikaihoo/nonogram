@@ -42,12 +42,13 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) =>
     'flex items-center justify-center border border-gray-300 text-xs text-center p-0.5 leading-tight';
 
   return (
-    <Card className="inline-block overflow-auto p-4">
+    <Card className="inline-block overflow-auto p-4 max-w-full">
       <div
         className="inline-grid"
         style={{
-          gridTemplateColumns: `${maxLeftHintWidth * 1.5}rem repeat(${cols}, 1.5rem)`,
-          gridTemplateRows: `${maxTopHintHeight * 1.5}rem repeat(${rows}, 1.5rem)`,
+          gridTemplateColumns: `${maxLeftHintWidth * 1.5}rem repeat(${cols}, minmax(1.2rem, 1fr))`,
+          gridTemplateRows: `${maxTopHintHeight * 1.5}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
+          maxWidth: '100%',
         }}
       >
         {/* Empty top-left corner */}

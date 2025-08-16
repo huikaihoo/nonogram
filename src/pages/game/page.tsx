@@ -23,8 +23,8 @@ function GamePage() {
   const [game, setGame] = React.useState(() => buildGame(seed, 20, 20, 0.6));
   const [inputMode, setInputMode] = React.useState<InputType>('filled');
   const [grid, setGrid] = React.useState<InputType[][]>(() => {
-    const heightNum = typeof height === 'number' ? height : parseInt(height as string) || DIMENSION_MIN;
-    const widthNum = typeof width === 'number' ? width : parseInt(width as string) || DIMENSION_MIN;
+    const heightNum = typeof height === 'number' ? height : parseInt(height as string, 10) || DIMENSION_MIN;
+    const widthNum = typeof width === 'number' ? width : parseInt(width as string, 10) || DIMENSION_MIN;
     return Array.from({ length: heightNum }, () => Array.from({ length: widthNum }, () => 'empty'));
   });
 
@@ -33,8 +33,8 @@ function GamePage() {
   };
 
   const handleNewGame = () => {
-    const heightNum = typeof height === 'number' ? height : parseInt(height as string) || DIMENSION_MIN;
-    const widthNum = typeof width === 'number' ? width : parseInt(width as string) || DIMENSION_MIN;
+    const heightNum = typeof height === 'number' ? height : parseInt(height as string, 10) || DIMENSION_MIN;
+    const widthNum = typeof width === 'number' ? width : parseInt(width as string, 10) || DIMENSION_MIN;
     const thresholdNum = typeof threshold === 'number' ? threshold : parseFloat(threshold as string) || THRESHOLD_MIN;
 
     const newGame = buildGame(seed, heightNum, widthNum, thresholdNum);

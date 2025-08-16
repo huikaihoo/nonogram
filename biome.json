@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -19,9 +19,25 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "style": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": ["./**/*", "../**/*"],
+                "message": "Use '@/' alias for imports from './src/' instead of using relative paths."
+              }
+            ]
+          }
+        }
+      },
       "a11y": {
         "noStaticElementInteractions": "off",
         "useKeyWithClickEvents": "off"
+      },
+      "correctness": {
+        "useUniqueElementIds": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off"
