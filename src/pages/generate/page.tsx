@@ -52,14 +52,9 @@ function GeneratePage() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
-            <Sparkles className="h-8 w-8 text-primary" />
-            Nonogram Generator
-          </h1>
+        <div className="text-center">
           <p className="text-muted-foreground">Upload your image and generate amazing nonogram for you</p>
         </div>
-
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
