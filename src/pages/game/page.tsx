@@ -1,45 +1,52 @@
-import React from 'react';
+import { Share2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import Board from '@/pages/game/board';
 import type { InputType } from '@/pages/game/cell';
+import { validatePuzzleCode } from '@/services/code';
 import { buildGame } from '@/services/game';
 
-// Configuration constants
-const DIMENSION_MIN = 5;
-const DIMENSION_MAX = 30;
-const THRESHOLD_MIN = 0.1;
-const THRESHOLD_MAX = 0.9;
-const THRESHOLD_STEP = 0.1;
+interface GamePageProps {
+  setGameCode: (code: string) => void;
+}
 
-function GamePage() {
-  const [seed, setSeed] = React.useState('4222');
-  const [height, setHeight] = React.useState<number | string>(20);
-  const [width, setWidth] = React.useState<number | string>(20);
-  const [threshold, setThreshold] = React.useState<number | string>(0.6);
+const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
+  const { type, code } = useParams<{ type: string; code: string }>();
 
-  const [game, setGame] = React.useState(() => buildGame(seed, 20, 20, 0.6));
-  const [inputMode, setInputMode] = React.useState<InputType>('filled');
-  const [grid, setGrid] = React.useState<InputType[][]>(() => {
-    const heightNum = typeof height === 'number' ? height : parseInt(height as string, 10) || DIMENSION_MIN;
-    const widthNum = typeof width === 'number' ? width : parseInt(width as string, 10) || DIMENSION_MIN;
-    return Array.from({ length: heightNum }, () => Array.from({ length: widthNum }, () => 'empty'));
-  });
+  // No need to keep puzzleCode in state if not used elsewhere
+  const [game, setGame] = useState(() => buildGame('4222', 20, 20, 0.6));
+  const [inputMode, setInputMode] = useState<InputType>('filled');
+  const [grid, setGrid] = useState<InputType[][]>(() =>
+    Array.from({ length: 20 }, () => Array.from({ length: 20 }, () => 'empty')),
+  );
 
-  const handleSeedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSeed(e.target.value);
-  };
+  const navigate = useNavigate();
 
-  const handleNewGame = () => {
-    const heightNum = typeof height === 'number' ? height : parseInt(height as string, 10) || DIMENSION_MIN;
-    const widthNum = typeof width === 'number' ? width : parseInt(width as string, 10) || DIMENSION_MIN;
-    const thresholdNum = typeof threshold === 'number' ? threshold : parseFloat(threshold as string) || THRESHOLD_MIN;
+  useEffect(() => {
+    // Validate type (must be 'p' or 'i') and code
+    const isValidType = type === 'p' || type === 'i';
+    const puzzleCode = validatePuzzleCode(code);
 
-    const newGame = buildGame(seed, heightNum, widthNum, thresholdNum);
-    setGame(newGame);
-    setGrid(Array.from({ length: heightNum }, () => Array.from({ length: widthNum }, () => 'empty')));
+    if (!isValidType || !puzzleCode) {
+      navigate('/start', { replace: true });
+    }
+    if (puzzleCode) {
+      setGameCode(puzzleCode.code);
+      const { seed, height, width, fillPercent } = puzzleCode;
+      const thresholdNum = fillPercent / 100;
+      setGame(buildGame(seed, height, width, thresholdNum));
+      setGrid(Array.from({ length: height }, () => Array.from({ length: width }, () => 'empty')));
+    }
+    return () => {
+      setGameCode(''); // Clear game code when component unmounts
+    };
+  }, [type, code, navigate, setGameCode]);
+
+  const handleRestart = () => {
+    setGrid(grid.map((row) => row.map(() => 'empty')));
   };
 
   const handleShowSolution = () => {
@@ -47,83 +54,41 @@ function GamePage() {
   };
 
   return (
-    <>
-      <div className="mt-4 flex items-center gap-2 flex-wrap">
-        <div className="flex items-center gap-1">
-          <label htmlFor="height" className="text-sm font-medium">
-            Height:
-          </label>
-          <Input
-            id="height"
-            type="number"
-            value={height}
-            numberValidation="int"
-            min={DIMENSION_MIN}
-            max={DIMENSION_MAX}
-            onValueChange={setHeight}
-            className="w-20"
-          />
+    <div className="container mx-auto p-6 max-w-4xl">
+      <div className="flex items-center justify-between gap-2 flex-wrap w-full">
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={handleRestart}>
+            Restart
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleShowSolution}>
+            Solution
+          </Button>
         </div>
-        <div className="flex items-center gap-1">
-          <label htmlFor="width" className="text-sm font-medium">
-            Width:
-          </label>
-          <Input
-            id="width"
-            type="number"
-            value={width}
-            numberValidation="int"
-            min={DIMENSION_MIN}
-            max={DIMENSION_MAX}
-            onValueChange={setWidth}
-            className="w-20"
-          />
-        </div>
-        <div className="flex items-center gap-1">
-          <label htmlFor="threshold" className="text-sm font-medium">
-            Threshold:
-          </label>
-          <Input
-            id="threshold"
-            type="number"
-            value={threshold}
-            numberValidation="float"
-            min={THRESHOLD_MIN}
-            max={THRESHOLD_MAX}
-            onValueChange={setThreshold}
-            className="w-20"
-            step={THRESHOLD_STEP}
-          />
-        </div>
-        <div className="flex items-center gap-1">
-          <label htmlFor="seed" className="text-sm font-medium">
-            Seed:
-          </label>
-          <Input id="seed" type="text" value={seed} onChange={handleSeedChange} className="w-36" placeholder="Seed" />
-        </div>
-        <Button onClick={handleNewGame}>New Game</Button>
-        <Button variant="outline" onClick={handleShowSolution}>
-          Solution
+        <Button size="sm">
+          <Share2 className="mr-2 h-4 w-4" />
+          Share
         </Button>
       </div>
-      <div className="mt-4">
+      <div className="mt-8 flex w-full">
         <Board grid={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
       </div>
-      <div className="mt-4 flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium">Mode:</span>
-        <ToggleGroup
-          variant="outline"
-          size="lg"
-          type="single"
-          value={inputMode}
-          onValueChange={(value) => value && setInputMode(value as InputType)}
-        >
-          <ToggleGroupItem value="filled">Fill</ToggleGroupItem>
-          <ToggleGroupItem value="crossed">Cross</ToggleGroupItem>
-        </ToggleGroup>
+      <div className="mt-8 flex justify-center">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Mode:</span>
+          <ToggleGroup
+            variant="outline"
+            size="lg"
+            type="single"
+            value={inputMode}
+            onValueChange={(value) => value && setInputMode(value as InputType)}
+          >
+            <ToggleGroupItem value="filled">Fill</ToggleGroupItem>
+            <ToggleGroupItem value="crossed">Cross</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
       </div>
-    </>
+    </div>
   );
-}
+};
 
 export default GamePage;

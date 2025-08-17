@@ -14,8 +14,8 @@ const defaultPreviewProps: PreviewProps = {
   width: 20,
   height: 20,
   method: 'surface',
-  grayscaleThreshold: 190,
-  fillPercentage: 15,
+  grayscaleThreshold: 192,
+  blackPercentage: 15,
 };
 
 function GeneratePage() {
@@ -70,14 +70,14 @@ function GeneratePage() {
                 width={pendingPreviewProps.width}
                 method={pendingPreviewProps.method}
                 grayscaleThreshold={pendingPreviewProps.grayscaleThreshold}
-                fillPercentage={pendingPreviewProps.fillPercentage}
+                blackPercentage={pendingPreviewProps.blackPercentage}
                 onHeightChange={(v) => setPendingPreviewProps((prev) => ({ ...prev, height: v }))}
                 onWidthChange={(v) => setPendingPreviewProps((prev) => ({ ...prev, width: v }))}
                 onMethodChange={(v) => setPendingPreviewProps((prev) => ({ ...prev, method: v }))}
                 onGrayscaleThresholdChange={(v) =>
                   setPendingPreviewProps((prev) => ({ ...prev, grayscaleThreshold: v }))
                 }
-                onFillPercentageChange={(v) => setPendingPreviewProps((prev) => ({ ...prev, fillPercentage: v }))}
+                onBlackPercentageChange={(v) => setPendingPreviewProps((prev) => ({ ...prev, blackPercentage: v }))}
               />
               <div className="flex justify-end gap-2">
                 <Button

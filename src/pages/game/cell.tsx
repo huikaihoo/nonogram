@@ -15,7 +15,7 @@ type CellProps = {
 
 const Cell: React.FC<CellProps> = ({ input, result, onClick, onRightClick, style, className }) => {
   const base =
-    'min-w-[1.2rem] min-h-[1.2rem] w-full h-full border border-gray-300 flex items-center justify-center select-none aspect-square';
+    'min-w-[1.2rem] min-h-[1.2rem] max-w-[2rem] max-h-[2rem] w-full h-full border border-gray-300 flex items-center justify-center select-none aspect-square';
   const cursorClass = input === 'empty' ? 'cursor-pointer' : 'cursor-default';
 
   // Determine if the current cell state is correct

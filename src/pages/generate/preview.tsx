@@ -18,7 +18,7 @@ export interface PreviewProps {
   originalImageUrl: string;
   method: 'surface' | 'edge';
   grayscaleThreshold: number;
-  fillPercentage: number;
+  blackPercentage: number;
   width: number;
   height: number;
   onLoadingChange?: (isLoading: boolean) => void;
@@ -28,7 +28,7 @@ const Preview: React.FC<PreviewProps> = ({
   originalImageUrl,
   method,
   grayscaleThreshold,
-  fillPercentage,
+  blackPercentage,
   width,
   height,
   onLoadingChange,
@@ -251,14 +251,14 @@ const Preview: React.FC<PreviewProps> = ({
           cropHeight,
           width,
           height,
-          fillPercentage,
+          blackPercentage,
         );
         setBooleanArray(booleanArray);
       }
     } catch (error) {
       console.error('Error converting outline to array:', error);
     }
-  }, [grayscaleThreshold, fillPercentage, width, height]);
+  }, [grayscaleThreshold, blackPercentage, width, height]);
 
   // Clear processed content when original image changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: Dependencies are intentionally omitted to prevent infinite re-renders when parameters change
@@ -311,8 +311,6 @@ const Preview: React.FC<PreviewProps> = ({
             )}
           </div>
         </div>
-
-        {/* Processed Image */}
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-center">Processed</h3>
           <div className="aspect-square rounded-lg border overflow-hidden bg-muted">
@@ -336,7 +334,6 @@ const Preview: React.FC<PreviewProps> = ({
             )}
           </div>
         </div>
-
         {/* Boolean Array Preview */}
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-center">Nonogram</h3>

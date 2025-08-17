@@ -38,89 +38,90 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) =>
   const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length));
   const maxLeftHintWidth = Math.max(...game.leftHints.map((h) => h.length));
 
-  const hintBlockClass =
-    'flex items-center justify-center border border-gray-300 text-xs text-center p-0.5 leading-tight';
+  const hintBlockClass = 'flex items-center justify-center border border-gray-300 text-xs text-center';
 
   return (
-    <Card className="inline-block overflow-auto p-4 max-w-full">
-      <div
-        className="inline-grid"
-        style={{
-          gridTemplateColumns: `${maxLeftHintWidth * 1.5}rem repeat(${cols}, minmax(1.2rem, 1fr))`,
-          gridTemplateRows: `${maxTopHintHeight * 1.5}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
-          maxWidth: '100%',
-        }}
-      >
-        {/* Empty top-left corner */}
-        <div className="col-span-1 row-span-1"></div>
+    <Card className="w-full block overflow-auto shadow-none border-0">
+      <div className="flex justify-center items-center w-full h-full">
+        <div
+          className="grid"
+          style={{
+            gridTemplateColumns: `${maxLeftHintWidth * 1}rem repeat(${cols}, minmax(1.2rem, 2rem))`,
+            gridTemplateRows: `${maxTopHintHeight * 1.2}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
+            maxWidth: '100%',
+          }}
+        >
+          {/* Empty top-left corner */}
+          <div className="col-span-1 row-span-1"></div>
 
-        {/* Top hints */}
-        {game.topHints.map((colHint, cIdx) => {
-          const extraBorder = [];
-          if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
-
-          return (
-            <div
-              key={`top-${cIdx}`}
-              className={cn(hintBlockClass, extraBorder.join(' '))}
-              style={{
-                gridColumnStart: cIdx + 2,
-                gridRowStart: 1,
-                flexDirection: 'column',
-                height: `${maxTopHintHeight * 1.5}rem`,
-              }}
-            >
-              {colHint.map((hint, idx) => (
-                <div key={idx}>{hint}</div>
-              ))}
-            </div>
-          );
-        })}
-
-        {/* Left hints */}
-        {game.leftHints.map((rowHint, rIdx) => {
-          const extraBorder = [];
-          if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black');
-
-          return (
-            <div
-              key={`left-${rIdx}`}
-              className={cn(hintBlockClass, extraBorder.join(' '))}
-              style={{
-                gridRowStart: rIdx + 2,
-                gridColumnStart: 1,
-                flexDirection: 'row',
-                width: `${maxLeftHintWidth * 1.5}rem`,
-              }}
-            >
-              {rowHint.join(' ')}
-            </div>
-          );
-        })}
-
-        {/* Cells */}
-        {grid.map((row, rIdx) =>
-          row.map((cell, cIdx) => {
+          {/* Top hints */}
+          {game.topHints.map((colHint, cIdx) => {
             const extraBorder = [];
             if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
+
+            return (
+              <div
+                key={`top-${cIdx}`}
+                className={cn(hintBlockClass, extraBorder.join(' '))}
+                style={{
+                  gridColumnStart: cIdx + 2,
+                  gridRowStart: 1,
+                  flexDirection: 'column',
+                  height: `${maxTopHintHeight * 1.2}rem`,
+                }}
+              >
+                {colHint.map((hint, idx) => (
+                  <div key={idx}>{hint}</div>
+                ))}
+              </div>
+            );
+          })}
+
+          {/* Left hints */}
+          {game.leftHints.map((rowHint, rIdx) => {
+            const extraBorder = [];
             if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black');
 
             return (
-              <Cell
-                key={`${rIdx}-${cIdx}`}
-                input={cell}
-                result={game.result[rIdx][cIdx]}
-                onClick={() => toggleCell(rIdx, cIdx)}
-                onRightClick={() => toggleCell(rIdx, cIdx, true)}
+              <div
+                key={`left-${rIdx}`}
+                className={cn(hintBlockClass, extraBorder.join(' '))}
                 style={{
-                  gridColumnStart: cIdx + 2,
                   gridRowStart: rIdx + 2,
+                  gridColumnStart: 1,
+                  flexDirection: 'row',
+                  width: `${maxLeftHintWidth * 1}rem`,
                 }}
-                className={extraBorder.join(' ')}
-              />
+              >
+                {rowHint.join(' ')}
+              </div>
             );
-          }),
-        )}
+          })}
+
+          {/* Cells */}
+          {grid.map((row, rIdx) =>
+            row.map((cell, cIdx) => {
+              const extraBorder = [];
+              if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
+              if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black');
+
+              return (
+                <Cell
+                  key={`${rIdx}-${cIdx}`}
+                  input={cell}
+                  result={game.result[rIdx][cIdx]}
+                  onClick={() => toggleCell(rIdx, cIdx)}
+                  onRightClick={() => toggleCell(rIdx, cIdx, true)}
+                  style={{
+                    gridColumnStart: cIdx + 2,
+                    gridRowStart: rIdx + 2,
+                  }}
+                  className={extraBorder.join(' ')}
+                />
+              );
+            }),
+          )}
+        </div>
       </div>
     </Card>
   );

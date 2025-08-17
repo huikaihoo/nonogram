@@ -9,12 +9,12 @@ interface ControlsProps {
   width: number;
   method: 'surface' | 'edge';
   grayscaleThreshold: number;
-  fillPercentage: number;
+  blackPercentage: number;
   onHeightChange: (value: number) => void;
   onWidthChange: (value: number) => void;
   onMethodChange: (value: 'surface' | 'edge') => void;
   onGrayscaleThresholdChange: (value: number) => void;
-  onFillPercentageChange: (value: number) => void;
+  onBlackPercentageChange: (value: number) => void;
 }
 
 export default function Controls({
@@ -22,18 +22,18 @@ export default function Controls({
   width,
   method,
   grayscaleThreshold,
-  fillPercentage,
+  blackPercentage,
   onHeightChange,
   onWidthChange,
   onMethodChange,
   onGrayscaleThresholdChange,
-  onFillPercentageChange,
+  onBlackPercentageChange,
 }: ControlsProps) {
   // Internal state for handling number | string values from inputs
   const [internalHeight, setInternalHeight] = useState<number | string>(height);
   const [internalWidth, setInternalWidth] = useState<number | string>(width);
   const [internalGrayscaleThreshold, setInternalGrayscaleThreshold] = useState<number | string>(grayscaleThreshold);
-  const [internalFillPercentage, setInternalFillPercentage] = useState<number | string>(fillPercentage);
+  const [internalBlackPercentage, setInternalBlackPercentage] = useState<number | string>(blackPercentage);
 
   // Sync internal state with props when they change
   useEffect(() => {
@@ -49,8 +49,8 @@ export default function Controls({
   }, [grayscaleThreshold]);
 
   useEffect(() => {
-    setInternalFillPercentage(fillPercentage);
-  }, [fillPercentage]);
+    setInternalBlackPercentage(blackPercentage);
+  }, [blackPercentage]);
 
   // Handle internal state changes and convert to numbers for parent callbacks
   const handleHeightChange = (value: number | string) => {
@@ -83,20 +83,20 @@ export default function Controls({
     onGrayscaleThresholdChange(numValue);
   };
 
-  const handleFillPercentageChange = (value: number | string) => {
-    setInternalFillPercentage(value);
+  const handleBlackPercentageChange = (value: number | string) => {
+    setInternalBlackPercentage(value);
     if (value === '') {
       // Don't call parent callback for empty string, let Input component handle validation
       return;
     }
     const numValue = typeof value === 'number' ? value : parseInt(value as string, 10) || 15;
-    onFillPercentageChange(numValue);
+    onBlackPercentageChange(numValue);
   };
 
   return (
     <div className="space-y-4">
-      {/* First row: Method, Fill Threshold, and Fill % */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* First row: Method, Fill Threshold, and Black % to Fill */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="method">Method</Label>
           <Select value={method} onValueChange={onMethodChange}>
@@ -122,22 +122,24 @@ export default function Controls({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="fillPercentage">Fill %</Label>
+          <Label htmlFor="blackPercentage" className={method === 'surface' ? 'cursor-not-allowed opacity-50' : ''}>
+            Black % to Fill
+          </Label>
           <Input
-            id="fillPercentage"
+            id="blackPercentage"
             type="number"
             numberValidation="int"
             min={0}
             max={100}
-            value={internalFillPercentage}
-            onValueChange={handleFillPercentageChange}
+            value={internalBlackPercentage}
+            onValueChange={handleBlackPercentageChange}
             disabled={method === 'surface'}
           />
         </div>
       </div>
 
       {/* Second row: Height and Width */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="height">Height</Label>
           <Input
