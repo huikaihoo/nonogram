@@ -1,3 +1,4 @@
+// bunx shadcn@latest add "https://diceui.com/r/file-upload"
 /** biome-ignore-all lint/a11y/useSemanticElements: ignore */
 'use client';
 

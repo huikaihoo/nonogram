@@ -1,3 +1,4 @@
+// bunx shadcn@latest add "https://diceui.com/r/copy-button"
 'use client';
 
 import { cva, type VariantProps } from 'class-variance-authority';
