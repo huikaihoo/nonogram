@@ -44,15 +44,18 @@ export default function PuzzleSection() {
               }
             }}
           >
-            {[6, 12].map((count, groupIdx) => (
-              <InputOTPGroup key={groupIdx}>
-                {Array.from({ length: count }).map((_, slotIdx) => {
-                  const index = groupIdx === 0 ? slotIdx : 6 + slotIdx;
-                  return <InputOTPSlot index={index} key={slotIdx} className="w-7 h-9 text-base px-1" />;
-                })}
-                {groupIdx === 0 && <InputOTPSeparator key="sep-0" />}
-              </InputOTPGroup>
-            ))}
+            {[6, 12].map((count, groupIdx) => {
+              const group = (
+                <InputOTPGroup key={groupIdx}>
+                  {Array.from({ length: count }).map((_, slotIdx) => {
+                    const index = groupIdx === 0 ? slotIdx : 6 + slotIdx;
+                    return <InputOTPSlot index={index} key={slotIdx} className="w-7 h-9 text-base px-1" />;
+                  })}
+                </InputOTPGroup>
+              );
+              const separator = groupIdx < 1 ? <InputOTPSeparator key={`sep-${groupIdx}`} /> : null;
+              return [group, separator];
+            })}
           </InputOTP>
         </div>
       </div>
