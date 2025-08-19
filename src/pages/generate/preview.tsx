@@ -12,7 +12,7 @@ import {
   grayImageToBooleanArray,
   loadMarvinImage,
   transparencyToWhite,
-} from '@/services/image';
+} from '@/logic/image';
 
 export interface PreviewProps {
   originalImageUrl: string;

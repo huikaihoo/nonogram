@@ -4,10 +4,10 @@ import { useNavigate, useParams } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { validatePuzzleCode } from '@/logic/code';
+import { buildGame } from '@/logic/game';
 import Board from '@/pages/game/board';
 import type { InputType } from '@/pages/game/cell';
-import { validatePuzzleCode } from '@/services/code';
-import { buildGame } from '@/services/game';
 
 interface GamePageProps {
   setGameCode: (code: string) => void;
@@ -70,7 +70,7 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
         </Button>
       </div>
       <div className="mt-8 flex w-full">
-        <Board grid={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
+        <Board grids={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
       </div>
       <div className="mt-8 flex justify-center">
         <div className="flex items-center gap-2">

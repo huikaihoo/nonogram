@@ -2,12 +2,11 @@ import { XIcon } from 'lucide-react';
 import type React from 'react';
 
 import { cn } from '@/lib/utils';
-
-type InputType = 'empty' | 'filled' | 'crossed' | 'solution';
+import type { InputType } from '@/logic/game';
 
 type CellProps = {
   coordinate: string;
-  input: InputType;
+  input: InputType; // "empty" | "filled" | "crossed" | "solution"
   result: boolean; // cell should be filled or not
   style?: React.CSSProperties;
   className?: string;

@@ -2,17 +2,17 @@ import { useRef, useState } from 'react';
 
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { autoFinisheGrids, type Game } from '@/logic/game';
 import Cell, { type InputType } from '@/pages/game/cell';
-import type { Game } from '@/services/game';
 
 type BoardProps = {
   game: Game;
   inputMode: InputType;
-  grid: InputType[][];
+  grids: InputType[][];
   onGridChange?: (grid: InputType[][]) => void;
 };
 
-const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) => {
+const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) => {
   const rows = game.leftHints.length;
   const cols = game.topHints.length;
 
@@ -32,17 +32,15 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) =>
   const toggleCell = (r: number, c: number, reverseMode = false) => {
     console.log('toggleCell', { r, c, reverseMode });
     if (!onGridChange) return;
-    const current = grid[r][c];
+    const current = grids[r][c];
     // Only allow clicks if the cell is empty
     if (current !== 'empty') return;
-    const newGrid = grid.map((row) => [...row]);
-    const currentMode: InputType = reverseMode ? (inputMode === 'filled' ? 'crossed' : 'filled') : inputMode;
-    if (currentMode === 'filled') {
-      newGrid[r][c] = 'filled';
-    } else if (currentMode === 'crossed') {
-      newGrid[r][c] = 'crossed';
-    }
-    onGridChange(newGrid);
+
+    const newGrids = grids.map((row) => [...row]);
+    newGrids[r][c] = reverseMode ? (inputMode === 'filled' ? 'crossed' : 'filled') : inputMode;
+    autoFinisheGrids(newGrids, game.solution, r, c); // auto update newGrids to crossed if row / col is finished
+
+    onGridChange(newGrids);
   };
 
   // Pointer event handlers (unified for mouse/touch/stylus)
@@ -54,7 +52,7 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) =>
       toggledCells: new Set(),
       axis: null,
       index: null,
-      reverseMode: e.button === 2,
+      reverseMode: e.button === 2, // check if it is right-click
     };
 
     const cell = getCellFromPointer(e);
@@ -211,7 +209,7 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) =>
           })}
 
           {/* Cells */}
-          {grid.map((row, rIdx) =>
+          {grids.map((row, rIdx) =>
             row.map((cell, cIdx) => {
               const extraBorder = [];
               if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
@@ -222,7 +220,7 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grid, onGridChange }) =>
                   key={`${rIdx}-${cIdx}`}
                   coordinate={`${rIdx}-${cIdx}`}
                   input={cell}
-                  result={game.result[rIdx][cIdx]}
+                  result={game.solution[rIdx][cIdx]}
                   style={{
                     gridColumnStart: cIdx + 2,
                     gridRowStart: rIdx + 2,

@@ -1,5 +1,5 @@
 export type Game = {
-  result: boolean[][];
+  solution: boolean[][];
   topHints: number[][];
   leftHints: number[][];
 };
@@ -71,27 +71,25 @@ export function buildGame(seed: string, height: number, width: number, threshold
 
   // Store random values once
   const randomValues: number[][] = Array.from({ length: height }, () => Array.from({ length: width }, () => rand()));
-
   const thresholds: number[][] = Array.from({ length: height }, () => Array.from({ length: width }, () => threshold));
-
-  const result: boolean[][] = Array.from({ length: height }, () => Array(width).fill(false));
+  const solution: boolean[][] = Array.from({ length: height }, () => Array(width).fill(false));
 
   const fillBoard = () => {
     for (let r = 0; r < height; r++) {
       for (let c = 0; c < width; c++) {
-        result[r][c] = randomValues[r][c] < thresholds[r][c];
+        solution[r][c] = randomValues[r][c] < thresholds[r][c];
       }
     }
   };
 
   const hasEmptyRowOrCol = (): boolean => {
     for (let r = 0; r < height; r++) {
-      if (result[r].every((cell) => !cell)) return true;
+      if (solution[r].every((cell) => !cell)) return true;
     }
     for (let c = 0; c < width; c++) {
       let colEmpty = true;
       for (let r = 0; r < height; r++) {
-        if (result[r][c]) {
+        if (solution[r][c]) {
           colEmpty = false;
           break;
         }
@@ -103,7 +101,7 @@ export function buildGame(seed: string, height: number, width: number, threshold
 
   const bumpEmptyThresholds = () => {
     for (let r = 0; r < height; r++) {
-      if (result[r].every((cell) => !cell)) {
+      if (solution[r].every((cell) => !cell)) {
         for (let c = 0; c < width; c++) {
           thresholds[r][c] = Math.min(1, thresholds[r][c] + step);
         }
@@ -112,7 +110,7 @@ export function buildGame(seed: string, height: number, width: number, threshold
     for (let c = 0; c < width; c++) {
       let colEmpty = true;
       for (let r = 0; r < height; r++) {
-        if (result[r][c]) {
+        if (solution[r][c]) {
           colEmpty = false;
           break;
         }
@@ -133,7 +131,52 @@ export function buildGame(seed: string, height: number, width: number, threshold
     bumpEmptyThresholds();
   }
 
-  const { topHints, leftHints } = buildHints(result, height, width);
+  return { solution, ...buildHints(solution, height, width) };
+}
 
-  return { result, topHints, leftHints };
+export type InputType = 'empty' | 'filled' | 'crossed' | 'solution';
+
+export function autoFinisheGrids(
+  grids: InputType[][],
+  solution: boolean[][],
+  rowId: number,
+  colId: number,
+): { rowFinished: boolean; colFinished: boolean } {
+  const rows = grids.length;
+  const cols = grids[0].length;
+  let rowFinished = true;
+  let colFinished = true;
+
+  // Check row: solution is true and grid is not empty
+  for (let j = 0; j < cols; j++) {
+    if (solution[rowId][j] && grids[rowId][j] === 'empty') {
+      rowFinished = false;
+      break;
+    }
+  }
+  // Check column: solution is true and grid is not empty
+  for (let i = 0; i < rows; i++) {
+    if (solution[i][colId] && grids[i][colId] === 'empty') {
+      colFinished = false;
+      break;
+    }
+  }
+
+  // Update to solution if finished
+  if (rowFinished) {
+    for (let j = 0; j < cols; j++) {
+      if (!solution[rowId][j] && grids[rowId][j] === 'empty') {
+        grids[rowId][j] = 'crossed';
+      }
+    }
+  }
+  if (colFinished) {
+    for (let i = 0; i < rows; i++) {
+      if (!solution[i][colId] && grids[i][colId] === 'empty') {
+        grids[i][colId] = 'crossed';
+      }
+    }
+  }
+
+  return { rowFinished, colFinished };
 }
