@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { autoFinisheGrids, type Game } from '@/logic/game';
 import Cell, { type InputType } from '@/pages/game/cell';
+import Hint from '@/pages/game/hint';
 
 type BoardProps = {
   game: Game;
@@ -151,8 +152,8 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
         <div
           className="grid"
           style={{
-            gridTemplateColumns: `${maxLeftHintWidth * 1}rem repeat(${cols}, minmax(1.2rem, 2rem))`,
-            gridTemplateRows: `${maxTopHintHeight * 1.2}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
+            gridTemplateColumns: `${maxLeftHintWidth * 1.2}rem repeat(${cols}, minmax(1.2rem, 2rem))`,
+            gridTemplateRows: `${maxTopHintHeight * 1.3}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
             maxWidth: '100%',
           }}
           onContextMenu={(e) => e.preventDefault()} // Prevent default context menu
@@ -177,11 +178,11 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
                   gridColumnStart: cIdx + 2,
                   gridRowStart: 1,
                   flexDirection: 'column',
-                  height: `${maxTopHintHeight * 1.2}rem`,
+                  height: `${maxTopHintHeight * 1.3}rem`,
                 }}
               >
-                {colHint.map((hint, idx) => (
-                  <div key={idx}>{hint}</div>
+                {colHint.map((data, idx) => (
+                  <Hint key={idx} hintType="col" data={data} grids={grids.map((row) => row[cIdx])} />
                 ))}
               </div>
             );
@@ -200,10 +201,12 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
                   gridRowStart: rIdx + 2,
                   gridColumnStart: 1,
                   flexDirection: 'row',
-                  width: `${maxLeftHintWidth * 1}rem`,
+                  width: `${maxLeftHintWidth * 1.2}rem`,
                 }}
               >
-                {rowHint.join(' ')}
+                {rowHint.map((data, idx) => (
+                  <Hint key={idx} hintType="row" data={data} grids={grids[rIdx]} />
+                ))}
               </div>
             );
           })}

@@ -13,28 +13,28 @@ type CellProps = {
 };
 
 const Cell: React.FC<CellProps> = ({ coordinate, input, result, style, className }) => {
-  const base =
+  let baseClass =
     'min-w-[1.2rem] min-h-[1.2rem] max-w-[2rem] max-h-[2rem] w-full h-full border border-gray-300 flex items-center justify-center select-none aspect-square';
   const isCorrect = input === 'empty' || (input === 'filled' && result) || (input === 'crossed' && !result);
 
-  let cellClass = cn(base, input === 'empty' ? 'cursor-pointer' : 'cursor-default');
+  baseClass = cn(baseClass, input === 'empty' ? 'cursor-pointer' : 'cursor-default');
   let content: React.ReactNode = null;
 
   if (input === 'empty' || (input === 'solution' && !result)) {
     // empty or not filled when apply solution
-    cellClass = cn(cellClass, 'bg-white', className);
+    baseClass = cn(baseClass, 'bg-white', className);
   } else if (result) {
     // filled
     const bgColor = input === 'solution' ? 'bg-yellow-400' : isCorrect ? 'bg-gray-500' : 'bg-red-400';
-    cellClass = cn(cellClass, bgColor, className);
+    baseClass = cn(baseClass, bgColor, className);
   } else {
     // not filled
-    cellClass = cn(cellClass, isCorrect ? 'text-gray-700' : 'text-red-400', 'text-2xl font-bold', className);
+    baseClass = cn(baseClass, isCorrect ? 'text-gray-700' : 'text-red-400', 'text-2xl font-bold', className);
     content = <XIcon strokeWidth={3} />;
   }
 
   return (
-    <div style={{ ...style, touchAction: 'none' }} className={cellClass} cell-coordinate={coordinate}>
+    <div style={{ ...style, touchAction: 'none' }} className={baseClass} cell-coordinate={coordinate}>
       {content}
     </div>
   );

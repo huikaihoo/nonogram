@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { validatePuzzleCode } from '@/logic/code';
-import { buildGame } from '@/logic/game';
+import { buildGame, type Game } from '@/logic/game';
 import Board from '@/pages/game/board';
 import type { InputType } from '@/pages/game/cell';
 
@@ -16,9 +16,8 @@ interface GamePageProps {
 const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
   const { type, code } = useParams<{ type: string; code: string }>();
 
-  // No need to keep puzzleCode in state if not used elsewhere
-  const [game, setGame] = useState(() => buildGame('4222', 20, 20, 0.6));
   const [inputMode, setInputMode] = useState<InputType>('filled');
+  const [game, setGame] = useState<Game | null>(null);
   const [grid, setGrid] = useState<InputType[][]>(() =>
     Array.from({ length: 20 }, () => Array.from({ length: 20 }, () => 'empty')),
   );
@@ -69,9 +68,11 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
           Share
         </Button>
       </div>
-      <div className="mt-8 flex w-full">
-        <Board grids={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
-      </div>
+      {game && (
+        <div className="mt-8 flex w-full">
+          <Board grids={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
+        </div>
+      )}
       <div className="mt-8 flex justify-center">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Mode:</span>

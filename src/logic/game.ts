@@ -1,7 +1,13 @@
+export type HintData = {
+  count: number;
+  firstIdx: number; // inclusive
+  lastIdx: number; // inclusive
+};
+
 export type Game = {
   solution: boolean[][];
-  topHints: number[][];
-  leftHints: number[][];
+  topHints: HintData[][];
+  leftHints: HintData[][];
 };
 
 function mixSeedTo32(seed: string, height: number, width: number, threshold: number): number {
@@ -29,38 +35,60 @@ function mulberry32(seed: number) {
   };
 }
 
-function buildHints(board: boolean[][], height: number, width: number) {
-  const topHints: number[][] = Array.from({ length: width }, () => []);
-  const leftHints: number[][] = Array.from({ length: height }, () => []);
+function buildHints(
+  board: boolean[][],
+  height: number,
+  width: number,
+): {
+  topHints: HintData[][];
+  leftHints: HintData[][];
+} {
+  // Initialize arrays with empty HintData arrays
+  const topHints: HintData[][] = Array.from({ length: width }, () => []);
+  const leftHints: HintData[][] = Array.from({ length: height }, () => []);
 
   // Calculate top hints (column-wise)
   for (let col = 0; col < width; col++) {
     let count = 0;
+    let firstIdx = -1;
     for (let row = 0; row < height; row++) {
       if (board[row][col]) {
+        if (count === 0) firstIdx = row; // Set first index when sequence starts
         count++;
       } else if (count > 0) {
-        topHints[col].push(count);
+        topHints[col].push({ count, firstIdx, lastIdx: row - 1 });
         count = 0;
+        firstIdx = -1;
       }
     }
-    if (count > 0) topHints[col].push(count);
-    if (topHints[col].length === 0) topHints[col].push(0);
+    if (count > 0) {
+      topHints[col].push({ count, firstIdx, lastIdx: height - 1 });
+    }
+    if (topHints[col].length === 0) {
+      topHints[col].push({ count: 0, firstIdx: -1, lastIdx: -1 });
+    }
   }
 
   // Calculate left hints (row-wise)
   for (let row = 0; row < height; row++) {
     let count = 0;
+    let firstIdx = -1;
     for (let col = 0; col < width; col++) {
       if (board[row][col]) {
+        if (count === 0) firstIdx = col; // Set first index when sequence starts
         count++;
       } else if (count > 0) {
-        leftHints[row].push(count);
+        leftHints[row].push({ count, firstIdx, lastIdx: col - 1 });
         count = 0;
+        firstIdx = -1;
       }
     }
-    if (count > 0) leftHints[row].push(count);
-    if (leftHints[row].length === 0) leftHints[row].push(0);
+    if (count > 0) {
+      leftHints[row].push({ count, firstIdx, lastIdx: width - 1 });
+    }
+    if (leftHints[row].length === 0) {
+      leftHints[row].push({ count: 0, firstIdx: -1, lastIdx: -1 });
+    }
   }
 
   return { topHints, leftHints };
