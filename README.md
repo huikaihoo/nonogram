@@ -5,7 +5,7 @@ This project is a modern Nonogram (Picross) online player and generator, built w
 ## Features
 - Play puzzles interactively in the browser
 - Deterministic random puzzle generation for reproducibility
-- Generate Nonogram puzzles from images or randomly (work in progress)
+- Generate Nonogram puzzles from images (work in progress)
 
 ## Folder Structure
 
