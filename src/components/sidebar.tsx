@@ -71,7 +71,7 @@ export default function AppSidebar({ navItems, history, ...props }: AppSidebarPr
                             <Link
                               to={path}
                               className={`text-muted-foreground truncate ${
-                                location.pathname.endsWith(path) ? 'underline' : ''
+                                location.pathname === path ? 'underline' : ''
                               }`}
                             >
                               #{item}
