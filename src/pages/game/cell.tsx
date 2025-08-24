@@ -14,7 +14,7 @@ type CellProps = {
 
 const Cell: React.FC<CellProps> = ({ coordinate, input, result, style, className }) => {
   let baseClass =
-    'min-w-[1.2rem] min-h-[1.2rem] max-w-[2rem] max-h-[2rem] w-full h-full border border-gray-300 flex items-center justify-center select-none aspect-square';
+    'min-w-[1.2rem] min-h-[1.2rem] max-w-[2rem] max-h-[2rem] w-full h-full border flex items-center justify-center select-none aspect-square dark:bg-gray-500 dark:text-black';
   const isCorrect = input === 'empty' || (input === 'filled' && result) || (input === 'crossed' && !result);
 
   baseClass = cn(baseClass, input === 'empty' ? 'cursor-pointer' : 'cursor-default');
@@ -25,11 +25,16 @@ const Cell: React.FC<CellProps> = ({ coordinate, input, result, style, className
     baseClass = cn(baseClass, 'bg-white', className);
   } else if (result) {
     // filled
-    const bgColor = input === 'solution' ? 'bg-yellow-400' : isCorrect ? 'bg-gray-500' : 'bg-red-400';
+    const bgColor = input === 'solution' || !isCorrect ? 'bg-red-400 dark:bg-red-900' : 'bg-gray-700 dark:bg-black';
     baseClass = cn(baseClass, bgColor, className);
   } else {
     // not filled
-    baseClass = cn(baseClass, isCorrect ? 'text-gray-700' : 'text-red-400', 'text-2xl font-bold', className);
+    baseClass = cn(
+      baseClass,
+      isCorrect ? 'text-gray-700' : 'text-red-400 dark:text-red-700 dark:bg-gray-500',
+      'text-2xl font-bold',
+      className,
+    );
     content = <XIcon strokeWidth={3} />;
   }
 

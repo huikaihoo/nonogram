@@ -1,69 +1,68 @@
-# React + TypeScript + Vite
+# Nonogram Online & Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a modern Nonogram (Picross) online player and generator, built with React, TypeScript, and Vite. It features modular UI, image-based puzzle generation, and a clean, maintainable codebase. Image processing is powered by MarvinJ (via marvinj-ts) and custom logic.
 
-Currently, two official plugins are available:
+## Features
+- Play puzzles interactively in the browser
+- Deterministic random puzzle generation for reproducibility
+- Generate Nonogram puzzles from images or randomly (work in progress)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Folder Structure
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+nonogram/
+├── public/                # Static assets (favicon, etc)
+├── src/
+│   ├── app.tsx            # App entry, routing
+│   ├── index.css          # Tailwind & global styles
+│   ├── main.tsx           # React root
+│   ├── assets/            # Image/logo assets
+│   ├── components/        # UI components (shadcn/ui pattern)
+│   │   ├── icon/          # Icon components
+│   │   └── ui/            # Shared UI primitives (button, card, file-upload, etc)
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Utilities functions
+│   ├── logic/             # Core logic (image processing, puzzle/game logic)
+│   └── pages/             # App pages (game, generate, start)
+│       ├── game/          # Game board, cell, hint, etc
+│       ├── generate/      # Image upload, preview, controls
+│       └── start/         # Start page, random puzzle, puzzle input
+├── .env                   # Environment variables for production build
+├── biome.json             # Biome linter/formatter config
+├── index.html             # Main HTML file
+├── package.json           # Project metadata & scripts
+├── pwa.apple.ts           # Config for pwa-assets-generator (apple-touch-icon)
+├── tsconfig*.json         # TypeScript configs
+└── vite.config.ts         # Vite configs
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
+```sh
+brew install bun
+bun install
+bunx --bun simple-git-hooks
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Create .env.local for local development
+echo -e "VITE_ENABLE_HTTPS=false\nVITE_BASE_URL=/" > .env.local
 ```
+
+### Useful Commands
+```sh
+bun dev # Start development server
+bun check # Lint & type check
+bun run build # Build for production
+bun preview # Preview production build
+
+bunx --bun shadcn@latest add <component> # Add shadcn/ui component
+bun pwa-assets-generator --config pwa.apple.ts # Generate apple-touch-icon
+
+bunx --bun taze # Update dependencies
+bunx --bun depcheck # Check for unused dependencies
+bunx --bun vite-bundle-visualizer # Visualize Vite bundle
+```
+
+## Contributing
+
+Pull requests and issues are welcome! Please follow the existing code style and patterns (see `.github/copilot-instructions.md` for AI automation conventions).

@@ -3,8 +3,8 @@ import RandomSection from '@/pages/start/random';
 
 function StartPage() {
   return (
-    <div className="container mx-auto p-6 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-12 text-center">Nonogram</h1>
+    <div className="container mx-auto p-1 max-w-2xl">
+      <h1 className="text-3xl font-bold mb-12 text-center">Nonogram Online</h1>
       <div className="flex flex-col items-center gap-2 mt-6 mb-6">
         <RandomSection />
       </div>

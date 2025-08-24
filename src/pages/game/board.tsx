@@ -144,7 +144,7 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
   const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length));
   const maxLeftHintWidth = Math.max(...game.leftHints.map((h) => h.length));
 
-  const hintBlockClass = 'flex items-center justify-center border border-gray-300 text-xs text-center';
+  const hintBlockClass = 'flex items-center justify-center border text-xs text-center dark:bg-gray-700';
 
   return (
     <Card className="w-full block overflow-auto shadow-none border-0">

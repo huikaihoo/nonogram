@@ -1,3 +1,9 @@
 {
-  "recommendations": ["bradlc.vscode-tailwindcss", "biomejs.biome"]
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "biomejs.biome",
+    "walnuts1018.oklch-vscode",
+    "oven.bun-vscode",
+    "github.vscode-github-actions"
+  ]
 }

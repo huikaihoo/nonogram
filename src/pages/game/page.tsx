@@ -53,7 +53,7 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto p-0 max-w-4xl">
       <div className="flex items-center justify-between gap-2 flex-wrap w-full">
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={handleRestart}>

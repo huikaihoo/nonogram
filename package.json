@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "bun@1.2.20",
   "scripts": {
     "lint": "biome format --write",
     "check": "biome check --write --unsafe",
@@ -10,43 +11,46 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host"
   },
+  "simple-git-hooks": {
+    "pre-commit": "bun check"
+  },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-toggle": "^1.1.9",
-    "@radix-ui/react-toggle-group": "^1.1.10",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
-    "@tailwindcss/vite": "^4.1.11",
+    "@tailwindcss/vite": "^4.1.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "input-otp": "^1.4.2",
-    "lucide-react": "^0.539.0",
+    "lucide-react": "^0.541.0",
     "marvinj-ts": "^0.2.1",
     "motion": "^12.23.12",
     "pure-rand": "^7.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router": "^7.8.1",
+    "react-router": "^7.8.2",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.12"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
-    "@eslint/js": "^9.32.0",
-    "@types/node": "^24.2.1",
-    "@types/react": "^19.1.10",
+    "@biomejs/biome": "^2.2.2",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
+    "@vite-pwa/assets-generator": "^1.0.0",
     "@vitejs/plugin-react-swc": "^3.11.0",
-    "eslint": "^9.32.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
-    "tw-animate-css": "^1.3.6",
+    "simple-git-hooks": "^2.13.1",
+    "tw-animate-css": "^1.3.7",
     "typescript": "~5.9.2",
-    "typescript-eslint": "^8.39.0",
-    "vite": "^7.1.2"
+    "vite": "^7.1.3",
+    "vite-plugin-mkcert": "^1.17.8",
+    "vite-plugin-pwa": "^1.0.3",
+    "vite-plugin-remove-console": "^2.2.0"
   }
 }

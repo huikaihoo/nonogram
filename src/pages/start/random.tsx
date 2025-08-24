@@ -14,7 +14,7 @@ export default function RandomSection() {
 
   const [height, setHeight] = useState<number | string>(20);
   const [width, setWidth] = useState<number | string>(20);
-  const [fillPercent, setFillPercent] = useState<number | string>(50);
+  const [fillPercent, setFillPercent] = useState<number | string>(70);
 
   const handleHeightChange = (value: number | string) => {
     setHeight(value);
@@ -39,7 +39,7 @@ export default function RandomSection() {
 
   return (
     <div className="space-y-2 w-full">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="height">Height</Label>
           <Input
