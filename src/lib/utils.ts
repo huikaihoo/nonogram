@@ -6,6 +6,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function padZero(n: number | string, maxlength: number) {
+  return n.toString().padStart(maxlength, '0');
+}
+
 export function generateRandomString(length: number, chars: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'): string {
   if (length <= 0) return '';
 

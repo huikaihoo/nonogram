@@ -1,7 +1,9 @@
-import { useRef, useState } from 'react';
+import { BadgeCheck, BadgeX } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn, padZero } from '@/lib/utils';
 import { autoFinisheGrids, type Game } from '@/logic/game';
 import Cell, { type InputType } from '@/pages/game/cell';
 import Hint from '@/pages/game/hint';
@@ -13,9 +15,53 @@ type BoardProps = {
   onGridChange?: (grid: InputType[][]) => void;
 };
 
+// Helper for pointer event
+const getCellFromPointer = (e: React.PointerEvent): [number, number, string] | null => {
+  const element = document.elementFromPoint(e.clientX, e.clientY);
+  if (!element) {
+    console.log('getCellFromPointer: no element at point', e.clientX, e.clientY);
+    return null;
+  }
+  const cellDiv = element.closest('[cell-coordinate]');
+  if (!cellDiv) {
+    console.log('getCellFromPointer: no cell found');
+    return null;
+  }
+  const coordinate = (cellDiv as HTMLElement).getAttribute('cell-coordinate');
+  if (!coordinate) {
+    console.log('getCellFromPointer: missing cell-coordinate attribute');
+    return null;
+  }
+  const [r, c] = coordinate.split('-').map(Number);
+  console.log('getCellFromPointer: found cell', r, c);
+  return [r, c, coordinate];
+};
+
 const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) => {
   const rows = game.leftHints.length;
   const cols = game.topHints.length;
+
+  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
+
+  const [correctCount, setCorrectCount] = useState(0);
+  const [wrongCount, setWrongCount] = useState(0);
+
+  // Calculate scores
+  useEffect(() => {
+    let correct = 0;
+    let wrong = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grids[r][c] === 'filled') {
+          game.solution[r][c] ? correct++ : wrong++;
+        } else if ((grids[r][c] === 'crossed' || grids[r][c] === 'solution') && game.solution[r][c]) {
+          wrong++;
+        }
+      }
+    }
+    setCorrectCount(correct);
+    setWrongCount(wrong);
+  }, [rows, cols, game, grids]);
 
   const [touching, setTouching] = useState(false);
   const touchStatus = useRef<{
@@ -93,10 +139,7 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
       }
 
       // After axis is set, only allow toggling cells in the same row or column as all toggled cells
-      // Allow toggling if:
-      // - axis is 'row' and row matches
-      // - axis is 'col' and col matches
-      // - axis is null (first cell)
+      // Allow toggling if (axis is 'row' and row matches) or (axis is 'col' and col matches) or (axis is null)
       if (
         (touchStatus.current.axis === 'row' && row === touchStatus.current.index) ||
         (touchStatus.current.axis === 'col' && col === touchStatus.current.index) ||
@@ -119,30 +162,8 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
     };
   };
 
-  // Helper for pointer event
-  const getCellFromPointer = (e: React.PointerEvent): [number, number, string] | null => {
-    const element = document.elementFromPoint(e.clientX, e.clientY);
-    if (!element) {
-      console.log('getCellFromPointer: no element at point', e.clientX, e.clientY);
-      return null;
-    }
-    const cellDiv = element.closest('[cell-coordinate]');
-    if (!cellDiv) {
-      console.log('getCellFromPointer: no cell found');
-      return null;
-    }
-    const coordinate = (cellDiv as HTMLElement).getAttribute('cell-coordinate');
-    if (!coordinate) {
-      console.log('getCellFromPointer: missing cell-coordinate attribute');
-      return null;
-    }
-    const [r, c] = coordinate.split('-').map(Number);
-    console.log('getCellFromPointer: found cell', r, c);
-    return [r, c, coordinate];
-  };
-
-  const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length));
-  const maxLeftHintWidth = Math.max(...game.leftHints.map((h) => h.length));
+  const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length), 5);
+  const maxLeftHintWidth = Math.max(...game.leftHints.map((h) => h.length), 5.5);
 
   const hintBlockClass = 'flex items-center justify-center border text-xs text-center dark:bg-gray-700';
 
@@ -162,24 +183,44 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
         >
-          {/* Empty top-left corner */}
-          <div className="col-span-1 row-span-1"></div>
+          {/* Top-left corner with score badges */}
+          <div className="col-span-1 row-span-1 flex flex-col items-center justify-center">
+            <span className="mb-1">
+              <Badge variant="default" className="bg-blue-600 text-white">
+                <BadgeCheck />
+                {padZero(correctCount, 3)}
+              </Badge>
+            </span>
+            <span>
+              <Badge variant="default" className="bg-red-600 text-white">
+                <BadgeX />
+                {padZero(wrongCount, 3)}
+              </Badge>
+            </span>
+          </div>
 
           {/* Top hints */}
           {game.topHints.map((colHint, cIdx) => {
+            const isHighlighted = !!hoveredCell && hoveredCell.col === cIdx;
             const extraBorder = [];
             if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
 
             return (
               <div
                 key={`top-${cIdx}`}
-                className={cn(hintBlockClass, extraBorder.join(' '))}
+                className={cn(
+                  hintBlockClass,
+                  extraBorder.join(' '),
+                  isHighlighted && 'bg-yellow-100 dark:bg-yellow-700/80',
+                )}
                 style={{
                   gridColumnStart: cIdx + 2,
                   gridRowStart: 1,
                   flexDirection: 'column',
                   height: `${maxTopHintHeight * 1.3}rem`,
                 }}
+                onMouseEnter={() => setHoveredCell({ row: -1, col: cIdx })}
+                onMouseLeave={() => setHoveredCell(null)}
               >
                 {colHint.map((data, idx) => (
                   <Hint key={idx} hintType="col" data={data} grids={grids.map((row) => row[cIdx])} />
@@ -190,19 +231,26 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
 
           {/* Left hints */}
           {game.leftHints.map((rowHint, rIdx) => {
+            const isHighlighted = !!hoveredCell && hoveredCell.row === rIdx;
             const extraBorder = [];
             if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black');
 
             return (
               <div
                 key={`left-${rIdx}`}
-                className={cn(hintBlockClass, extraBorder.join(' '))}
+                className={cn(
+                  hintBlockClass,
+                  extraBorder.join(' '),
+                  isHighlighted && 'bg-yellow-100 dark:bg-yellow-700/80',
+                )}
                 style={{
                   gridRowStart: rIdx + 2,
                   gridColumnStart: 1,
                   flexDirection: 'row',
                   width: `${maxLeftHintWidth * 1.2}rem`,
                 }}
+                onMouseEnter={() => setHoveredCell({ row: rIdx, col: -1 })}
+                onMouseLeave={() => setHoveredCell(null)}
               >
                 {rowHint.map((data, idx) => (
                   <Hint key={idx} hintType="row" data={data} grids={grids[rIdx]} />
@@ -229,6 +277,9 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
                     gridRowStart: rIdx + 2,
                   }}
                   className={extraBorder.join(' ')}
+                  isHighlighted={hoveredCell !== null && (hoveredCell.row === rIdx) !== (hoveredCell.col === cIdx)}
+                  onMouseEnter={() => setHoveredCell({ row: rIdx, col: cIdx })}
+                  onMouseLeave={() => setHoveredCell(null)}
                 />
               );
             }),
