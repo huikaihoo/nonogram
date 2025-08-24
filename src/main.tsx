@@ -11,7 +11,7 @@ import '@/index.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <Router basename={import.meta.env.VITE_BASE_URL}>
+      <Router basename={import.meta.env.VITE_BASE_URL || '/'}>
         <App />
       </Router>
     </ThemeProvider>
