@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { validatePuzzleCode } from '@/logic/code';
 import { buildGame, type Game } from '@/logic/game';
 import Board from '@/pages/game/board';
@@ -18,9 +19,8 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
 
   const [inputMode, setInputMode] = useState<InputType>('filled');
   const [game, setGame] = useState<Game | null>(null);
-  const [grid, setGrid] = useState<InputType[][]>(() =>
-    Array.from({ length: 20 }, () => Array.from({ length: 20 }, () => 'empty')),
-  );
+  const [grid, setGrid] = useLocalStorage<InputType[][] | null>(code || '', null);
+  const [_, setGameHistory] = useLocalStorage<string[]>('game-history', []);
 
   const navigate = useNavigate();
 
@@ -37,19 +37,33 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
       const { seed, height, width, fillPercent } = puzzleCode;
       const thresholdNum = fillPercent / 100;
       setGame(buildGame(seed, height, width, thresholdNum));
-      setGrid(Array.from({ length: height }, () => Array.from({ length: width }, () => 'empty')));
+      // Only initialize grid if not already present in local storage
+      if (!grid) {
+        setGrid(Array.from({ length: height }, () => Array.from({ length: width }, () => 'empty')));
+      }
+      // Update game history, remove current code if past history, prepend, limit to 15
+      setGameHistory((prev) => {
+        const filtered = prev.filter((c) => c !== puzzleCode.code);
+        return [puzzleCode.code, ...filtered].slice(0, 15);
+      });
     }
     return () => {
       setGameCode(''); // Clear game code when component unmounts
     };
-  }, [type, code, navigate, setGameCode]);
+  }, [type, code, navigate, setGameCode, grid, setGrid, setGameHistory]);
 
   const handleRestart = () => {
-    setGrid(grid.map((row) => row.map(() => 'empty')));
+    if (game) {
+      const rows = game.solution.length;
+      const cols = game.solution[0]?.length || 0;
+      setGrid(Array.from({ length: rows }, () => Array.from({ length: cols }, () => 'empty')));
+    }
   };
 
   const handleShowSolution = () => {
-    setGrid(grid.map((row) => row.map((cell) => (cell === 'empty' ? 'solution' : cell))));
+    if (grid) {
+      setGrid(grid.map((row: InputType[]) => row.map((cell: InputType) => (cell === 'empty' ? 'solution' : cell))));
+    }
   };
 
   return (
@@ -68,7 +82,7 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
           Share
         </Button>
       </div>
-      {game && (
+      {game && grid && (
         <div className="mt-8 flex w-full">
           <Board grids={grid} game={game} onGridChange={setGrid} inputMode={inputMode} />
         </div>
