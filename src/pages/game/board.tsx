@@ -162,8 +162,8 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
     };
   };
 
-  const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length), 5);
-  const maxLeftHintWidth = Math.max(...game.leftHints.map((h) => h.length), 5.5);
+  const maxTopHintHeight = Math.max(...game.topHints.map((h) => h.length), 5) * 1.35;
+  const maxLeftHintWidth = Math.max(...game.leftHints.map((h) => h.length), 5.5) * 1.2;
 
   const hintBlockClass = 'flex items-center justify-center border text-xs text-center dark:bg-gray-700';
 
@@ -171,11 +171,10 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
     <Card className="w-full block overflow-auto shadow-none border-0">
       <div className="flex justify-center items-center w-full h-full">
         <div
-          className="grid"
+          className="grid max-w-full"
           style={{
-            gridTemplateColumns: `${maxLeftHintWidth * 1.2}rem repeat(${cols}, minmax(1.2rem, 2rem))`,
-            gridTemplateRows: `${maxTopHintHeight * 1.3}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
-            maxWidth: '100%',
+            gridTemplateColumns: `${maxLeftHintWidth}rem repeat(${cols}, minmax(1.2rem, 2rem))`,
+            gridTemplateRows: `${maxTopHintHeight}rem repeat(${rows}, minmax(1.2rem, 1fr))`,
           }}
           onContextMenu={(e) => e.preventDefault()} // Prevent default context menu
           onPointerDown={handlePointerDown}
@@ -203,21 +202,19 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
           {game.topHints.map((colHint, cIdx) => {
             const isHighlighted = !!hoveredCell && hoveredCell.col === cIdx;
             const extraBorder = [];
-            if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
+            if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black dark:border-l-white');
 
             return (
               <div
                 key={`top-${cIdx}`}
                 className={cn(
+                  `flex-col max-h-[${maxTopHintHeight}rem] row-start-1`,
                   hintBlockClass,
-                  extraBorder.join(' '),
+                  ...extraBorder,
                   isHighlighted && 'bg-yellow-100 dark:bg-yellow-700/80',
                 )}
                 style={{
                   gridColumnStart: cIdx + 2,
-                  gridRowStart: 1,
-                  flexDirection: 'column',
-                  height: `${maxTopHintHeight * 1.3}rem`,
                 }}
                 onMouseEnter={() => setHoveredCell({ row: -1, col: cIdx })}
                 onMouseLeave={() => setHoveredCell(null)}
@@ -233,21 +230,19 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
           {game.leftHints.map((rowHint, rIdx) => {
             const isHighlighted = !!hoveredCell && hoveredCell.row === rIdx;
             const extraBorder = [];
-            if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black');
+            if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black dark:border-t-white');
 
             return (
               <div
                 key={`left-${rIdx}`}
                 className={cn(
+                  `flex-row max-w-[${maxLeftHintWidth}rem] row-start-[${rIdx + 2}] col-start-1`,
                   hintBlockClass,
-                  extraBorder.join(' '),
+                  ...extraBorder,
                   isHighlighted && 'bg-yellow-100 dark:bg-yellow-700/80',
                 )}
                 style={{
                   gridRowStart: rIdx + 2,
-                  gridColumnStart: 1,
-                  flexDirection: 'row',
-                  width: `${maxLeftHintWidth * 1.2}rem`,
                 }}
                 onMouseEnter={() => setHoveredCell({ row: rIdx, col: -1 })}
                 onMouseLeave={() => setHoveredCell(null)}
@@ -263,8 +258,8 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
           {grids.map((row, rIdx) =>
             row.map((cell, cIdx) => {
               const extraBorder = [];
-              if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black');
-              if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black');
+              if (cIdx % 5 === 0) extraBorder.push('border-l-2 border-l-black dark:border-l-white');
+              if (rIdx % 5 === 0) extraBorder.push('border-t-2 border-t-black dark:border-t-white');
 
               return (
                 <Cell
@@ -272,11 +267,7 @@ const Board: React.FC<BoardProps> = ({ game, inputMode, grids, onGridChange }) =
                   coordinate={`${rIdx}-${cIdx}`}
                   input={cell}
                   result={game.solution[rIdx][cIdx]}
-                  style={{
-                    gridColumnStart: cIdx + 2,
-                    gridRowStart: rIdx + 2,
-                  }}
-                  className={extraBorder.join(' ')}
+                  className={cn(...extraBorder)}
                   isHighlighted={hoveredCell !== null && (hoveredCell.row === rIdx) !== (hoveredCell.col === cIdx)}
                   onMouseEnter={() => setHoveredCell({ row: rIdx, col: cIdx })}
                   onMouseLeave={() => setHoveredCell(null)}
