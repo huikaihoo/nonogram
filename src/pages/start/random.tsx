@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { generateRandomString } from '@/lib/utils';
-
-const pad2 = (n: number | string) => n.toString().padStart(2, '0');
+import { generateRandomString, padZero } from '@/lib/utils';
 
 export interface RandomProps {
   height: number | string;
@@ -40,9 +38,9 @@ export default function RandomSection() {
 
   // Generate a 12-char random string with time
   const handleStartRandom = () => {
-    const h = pad2(randomProps.height);
-    const w = pad2(randomProps.width);
-    const f = pad2(randomProps.fillPercent);
+    const h = padZero(randomProps.height, 2);
+    const w = padZero(randomProps.width, 2);
+    const f = padZero(randomProps.fillPercent, 2);
     const randomStr = generateRandomString(12);
     navigate(`/game/p/${h}${w}${f}${randomStr}`);
   };

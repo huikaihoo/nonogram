@@ -355,10 +355,7 @@ const Preview: React.FC<PreviewProps> = ({
                   return (
                     <div
                       key={index}
-                      className={`border-gray-300 ${!isLastCol ? 'border-r' : ''} ${!isLastRow ? 'border-b' : ''}`}
-                      style={{
-                        backgroundColor: value ? '#000000' : '#ffffff',
-                      }}
+                      className={`border-gray-300 ${value ? 'bg-black' : 'bg-white'} ${!isLastCol ? 'border-r' : ''} ${!isLastRow ? 'border-b' : ''}`}
                     />
                   );
                 })}
@@ -386,10 +383,7 @@ const Preview: React.FC<PreviewProps> = ({
                   return (
                     <div
                       key={index}
-                      className={`border-gray-300 ${!isLastCol ? 'border-r' : ''} ${!isLastRow ? 'border-b' : ''}`}
-                      style={{
-                        backgroundColor: '#ffffff',
-                      }}
+                      className={`bg-white border-gray-300 ${!isLastCol ? 'border-r' : ''} ${!isLastRow ? 'border-b' : ''}`}
                     />
                   );
                 })}
