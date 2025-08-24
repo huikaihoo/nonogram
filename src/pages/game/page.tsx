@@ -19,7 +19,7 @@ const GamePage: React.FC<GamePageProps> = ({ setGameCode }) => {
 
   const [inputMode, setInputMode] = useState<InputType>('filled');
   const [game, setGame] = useState<Game | null>(null);
-  const [grid, setGrid] = useLocalStorage<InputType[][] | null>(code || '', null);
+  const [grid, setGrid] = useLocalStorage<InputType[][] | null>(`game:${code || 'invalid'}`, null);
   const [_, setGameHistory] = useLocalStorage<string[]>('game-history', []);
 
   const navigate = useNavigate();

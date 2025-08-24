@@ -7,7 +7,7 @@ import { useEventListener } from '@/hooks/use-event-listener';
 
 declare global {
   interface WindowEventMap {
-    'local-storage': CustomEvent;
+    'local-storage': StorageEvent;
   }
 }
 

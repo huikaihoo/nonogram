@@ -63,10 +63,10 @@ export default function AppSidebar({ navItems, history, ...props }: AppSidebarPr
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {history && history.length > 0 ? (
-                    history.map((item, idx) => {
+                    history.map((item) => {
                       const path = `/game/p/${item.replace('-', '')}`;
                       return (
-                        <SidebarMenuSubItem key={item + idx}>
+                        <SidebarMenuSubItem key={item}>
                           <SidebarMenuSubButton asChild>
                             <Link
                               to={path}
