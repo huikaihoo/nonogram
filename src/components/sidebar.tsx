@@ -29,7 +29,7 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   history: string[];
 };
 
-export default function AppSidebar({ navItems, ...props }: AppSidebarProps) {
+export default function AppSidebar({ navItems, history, ...props }: AppSidebarProps) {
   const location = useLocation();
 
   return (
@@ -62,26 +62,24 @@ export default function AppSidebar({ navItems, ...props }: AppSidebarProps) {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {props.history && props.history.length > 0 ? (
-                    props.history.map((item, idx) =>
-                      (() => {
-                        const path = `/game/p/${item.replace('-', '')}`;
-                        return (
-                          <SidebarMenuSubItem key={item + idx}>
-                            <SidebarMenuSubButton asChild>
-                              <Link
-                                to={path}
-                                className={`text-muted-foreground truncate ${
-                                  location.pathname.endsWith(path) ? 'underline' : ''
-                                }`}
-                              >
-                                #{item}
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        );
-                      })(),
-                    )
+                  {history && history.length > 0 ? (
+                    history.map((item, idx) => {
+                      const path = `/game/p/${item.replace('-', '')}`;
+                      return (
+                        <SidebarMenuSubItem key={item + idx}>
+                          <SidebarMenuSubButton asChild>
+                            <Link
+                              to={path}
+                              className={`text-muted-foreground truncate ${
+                                location.pathname.endsWith(path) ? 'underline' : ''
+                              }`}
+                            >
+                              #{item}
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })
                   ) : (
                     <SidebarMenuSubItem>
                       <span className="text-xs text-muted-foreground italic">No History</span>
