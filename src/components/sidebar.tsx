@@ -64,7 +64,7 @@ export default function AppSidebar({ navItems, history, ...props }: AppSidebarPr
                 <SidebarMenuSub>
                   {history && history.length > 0 ? (
                     history.map((item) => {
-                      const path = `/game/p/${item.replace('-', '')}`;
+                      const path = `/game/p/${item.replaceAll('-', '')}`;
                       return (
                         <SidebarMenuSubItem key={item}>
                           <SidebarMenuSubButton asChild>
