@@ -1,38 +1,48 @@
 import { Dices } from 'lucide-react';
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { generateRandomString } from '@/lib/utils';
 
 const pad2 = (n: number | string) => n.toString().padStart(2, '0');
 
+export interface RandomProps {
+  height: number | string;
+  width: number | string;
+  fillPercent: number | string;
+}
+
+const defaultRandomProps: RandomProps = {
+  height: 20,
+  width: 20,
+  fillPercent: 70,
+};
+
 export default function RandomSection() {
   const navigate = useNavigate();
 
-  const [height, setHeight] = useState<number | string>(20);
-  const [width, setWidth] = useState<number | string>(20);
-  const [fillPercent, setFillPercent] = useState<number | string>(70);
+  const [randomProps, setRandomProps] = useLocalStorage<RandomProps>('random-props', defaultRandomProps);
 
   const handleHeightChange = (value: number | string) => {
-    setHeight(value);
+    setRandomProps((prev) => ({ ...prev, height: value }));
   };
 
   const handleWidthChange = (value: number | string) => {
-    setWidth(value);
+    setRandomProps((prev) => ({ ...prev, width: value }));
   };
 
   const handleFillPercentChange = (value: number | string) => {
-    setFillPercent(value);
+    setRandomProps((prev) => ({ ...prev, fillPercent: value }));
   };
 
   // Generate a 12-char random string with time
   const handleStartRandom = () => {
-    const h = pad2(height);
-    const w = pad2(width);
-    const f = pad2(fillPercent);
+    const h = pad2(randomProps.height);
+    const w = pad2(randomProps.width);
+    const f = pad2(randomProps.fillPercent);
     const randomStr = generateRandomString(12);
     navigate(`/game/p/${h}${w}${f}${randomStr}`);
   };
@@ -48,7 +58,7 @@ export default function RandomSection() {
             numberValidation="int"
             min={5}
             max={30}
-            value={height}
+            value={randomProps.height}
             onValueChange={handleHeightChange}
             className="w-full"
           />
@@ -61,7 +71,7 @@ export default function RandomSection() {
             numberValidation="int"
             min={5}
             max={30}
-            value={width}
+            value={randomProps.width}
             onValueChange={handleWidthChange}
             className="w-full"
           />
@@ -74,7 +84,7 @@ export default function RandomSection() {
             numberValidation="int"
             min={10}
             max={90}
-            value={fillPercent}
+            value={randomProps.fillPercent}
             onValueChange={handleFillPercentChange}
             className="w-full"
           />

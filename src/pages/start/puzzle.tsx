@@ -27,7 +27,7 @@ export default function PuzzleSection() {
       <div className="mt-6 flex flex-col gap-2 items-center">
         <div className="relative w-fit">
           <Label htmlFor="otp" className="absolute -top-6 left-20 sm:left-0 pl-1">
-            Puzzle Code
+            Puzzle Code #
           </Label>
           <InputOTP
             id="otp"

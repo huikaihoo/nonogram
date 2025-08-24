@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import GamePage from '@/pages/game/page';
 import GeneratePage from '@/pages/generate/page';
 import StartPage from '@/pages/start/page';
@@ -16,7 +17,7 @@ const navItems: NavItem[] = [
   { title: 'Home', url: '/', icon: Home, showInSidebar: true },
   { title: 'Nonogram Generator', url: '/generate', icon: Sparkles, showInSidebar: true },
   { title: 'Puzzle #', url: '/game/p/', icon: Gamepad2, showInSidebar: false },
-  { title: 'Image #', url: '/game/i/', icon: Copy, showInSidebar: false },
+  { title: 'Image @', url: '/game/i/', icon: Copy, showInSidebar: false },
 ];
 
 function App() {
@@ -25,13 +26,14 @@ function App() {
   const Icon = current.icon;
 
   const [gameCode, setGameCode] = useState<string>('');
+  const [gameHistory] = useLocalStorage<string[]>('game-history', []);
 
   const { theme, setTheme } = useTheme();
   const isLight = theme === 'light';
 
   return (
     <SidebarProvider>
-      <AppSidebar navItems={navItems} />
+      <AppSidebar navItems={navItems} history={gameHistory} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4 flex-1">

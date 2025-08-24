@@ -1,7 +1,8 @@
-import type { LucideIcon } from 'lucide-react';
-import { Link } from 'react-router';
+import { ChevronRight, History, type LucideIcon } from 'lucide-react';
+import { Link, useLocation } from 'react-router';
 
 import { Github } from '@/components/icon/github';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +11,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
 
@@ -22,15 +26,17 @@ export type NavItem = {
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   navItems: NavItem[];
+  history: string[];
 };
 
-export default function AppSidebar({ navItems, ...props }: AppSidebarProps) {
+export default function AppSidebar({ navItems, history, ...props }: AppSidebarProps) {
+  const location = useLocation();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
         <SidebarMenu className="mt-1">
           <SidebarGroup>
-            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
             {navItems
               .filter(({ showInSidebar }) => showInSidebar)
               .map(({ url, title, icon: Icon }) => (
@@ -43,6 +49,45 @@ export default function AppSidebar({ navItems, ...props }: AppSidebarProps) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+          </SidebarGroup>
+        </SidebarMenu>
+        <SidebarMenu>
+          <SidebarGroup>
+            <Collapsible defaultOpen className="group/collapsible">
+              <CollapsibleTrigger asChild>
+                <SidebarGroupLabel className="cursor-pointer">
+                  <History className="mr-2" /> Game History{' '}
+                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                </SidebarGroupLabel>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  {history && history.length > 0 ? (
+                    history.map((item) => {
+                      const path = `/game/p/${item.replaceAll('-', '')}`;
+                      return (
+                        <SidebarMenuSubItem key={item}>
+                          <SidebarMenuSubButton asChild>
+                            <Link
+                              to={path}
+                              className={`text-muted-foreground truncate ${
+                                location.pathname === path ? 'underline' : ''
+                              }`}
+                            >
+                              #{item}
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })
+                  ) : (
+                    <SidebarMenuSubItem>
+                      <span className="text-xs text-muted-foreground italic">No History</span>
+                    </SidebarMenuSubItem>
+                  )}
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </Collapsible>
           </SidebarGroup>
         </SidebarMenu>
         {/* Bottom group */}
